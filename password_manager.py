@@ -36,17 +36,34 @@ def save_password():
             with open("passlist.json", "r") as passlist:
                 #open passlist json file
                 data = json.load(passlist)
-                #updating data in file
-                data.update(new_data)
+        except FileNotFoundError:
+            with open("passlist.json", "w") as passlist:
+                json.dump(new_data, passlist, indent=4)
+        else:
+            #updating data in file
+            data.update(new_data)
             with open("passlist.json", "w") as passlist:
                 json.dump(data, passlist, indent=4)
                 website_entry.delete(0, END)
                 password_entry.delete(0, END)
-        except FileNotFoundError:
-            with open("passlist.json", "w") as passlist:
-                json.dump(new_data, passlist, indent=4)
-                website_entry.delete(0, END)
-                password_entry.delete(0, END)
+        finally:
+            website_entry.delete(0, END)
+            password_entry.delete(0, END)
+
+# ---------------------------- FIND PASSWORD ------------------------------- #
+def find_password():
+    website = website_entry.get()
+    with open("passlist.json", "r") as passlist:
+        # open passlist json file
+        data = json.load(passlist)
+        if website in data.keys():
+            retrieved_username = data[website]["email"]
+            retrieved_password = data[website]["password"]
+            messagebox.showinfo(title=f"{website} data", message=f"Username/Email:    {retrieved_username}\n Password:    {retrieved_password}")
+
+
+
+
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -70,9 +87,9 @@ password_label.grid(column=0, row=3)
 
 
 #entries
-website_entry = Entry(width=45)
+website_entry = Entry(width=27)
 website_entry.focus()
-website_entry.grid(column=1, row=1, columnspan=2)
+website_entry.grid(column=1, row=1)
 username_entry = Entry(width=45)
 username_entry.insert(0, "username@email.com")
 username_entry.grid(column=1, row=2, columnspan=2)
@@ -85,6 +102,7 @@ generate_password_button = Button(text="Generate Password", command=generate_pas
 generate_password_button.grid(column=2, row=3)
 add_password_button = Button(width=38, text="Add", command=save_password)
 add_password_button.grid(column=1, row=4, columnspan=2)
-
+find_password_button = Button(width=14, text="Find", command=find_password)
+find_password_button.grid(column=2, row=1)
 
 window.mainloop()
