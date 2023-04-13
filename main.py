@@ -5,6 +5,8 @@ def button_clicked():
     my_label.config(text=input.get())
 
 
+# pyinstaller --icon=pomodoro.ico --add-data "tomato.png;." --noconsole pomodoro.py
+
 window = Tk()
 window.title("My GUI")
 window.minsize(width=800, height=600)

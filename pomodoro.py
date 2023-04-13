@@ -1,8 +1,6 @@
 from tkinter import *
 import math
 
-def button1_clicked():
-    pass
 
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
@@ -10,24 +8,67 @@ RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Courier"
-WORK_MIN = 25
-SHORT_BREAK_MIN = 5
-LONG_BREAK_MIN = 20
+WORK_MIN = 10
+SHORT_BREAK_MIN = 2
+LONG_BREAK_MIN = 5
+REPS = 0
+TIMER = None
 
 # ---------------------------- TIMER RESET ------------------------------- # 
+def reset_timer():
+    global REPS
+    window.after_cancel(TIMER)
+    canvas.itemconfig(timer_text, text="00:00")
+    label.config(text="Timer", bg=YELLOW, fg=GREEN)
+    checkmark.config(text="")
+    REPS = 0
+
+
+
 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer():
-    count_down(300)
+    global REPS
+    REPS += 1
+    work_sec = WORK_MIN * 60
+    short_break_sec = SHORT_BREAK_MIN * 60
+    long_break_sec = LONG_BREAK_MIN * 60
+    #if it's 8th:
+    if REPS % 8 == 0:
+        count_down(long_break_sec)
+        label.config(text="Long Break", bg=YELLOW, fg=RED)
+    #if it's 2nd, 4th, 6th rep:
+    elif REPS % 2 == 0:
+        count_down(short_break_sec)
+        label.config(text="Break", bg=YELLOW, fg=PINK)
+    else:
+        count_down(work_sec)
+        label.config(text="Work!", bg=YELLOW, fg=GREEN)
+
 
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 def count_down(count):
+    global REPS
+    global TIMER
     count_min = math.floor(count / 60)
     count_sec = count % 60
+    if count_sec == 0:
+        count_sec = "00"
+    elif count_sec < 10:
+        count_sec = f"0{count_sec}"
+
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
     if count > 0:
-        window.after(1000, count_down, count -1)
+      TIMER = window.after(1000, count_down, count -1)
+    else:
+        start_timer()
+        mark = ""
+        work_sessions = math.floor(REPS/2)
+        for _ in range(work_sessions):
+            mark += "✔"
+        checkmark.config(text=mark)
+
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -48,7 +89,7 @@ label = Label(text="Timer", bg=YELLOW, fg=GREEN, font=(FONT_NAME, 23, "bold"))
 label.grid(column=1, row=0)
 
 
-checkmark = Label(text="✔", bg=YELLOW, fg=GREEN, font=(FONT_NAME, 23, "bold"))
+checkmark = Label(bg=YELLOW, fg=GREEN, font=(FONT_NAME, 23, "bold"))
 checkmark.grid(column=1, row=4)
 
 
@@ -56,7 +97,7 @@ button1 = Button(text="Start", bg=YELLOW, command=start_timer, highlightthicknes
 button1.grid(column=0, row=2)
 
 
-button2 = Button(text="Reset", bg=YELLOW, command=button1_clicked, highlightthickness=0)
+button2 = Button(text="Reset", bg=YELLOW, command=reset_timer, highlightthickness=0)
 button2.grid(column=2, row=2)
 
 
