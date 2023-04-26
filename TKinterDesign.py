@@ -1,7 +1,7 @@
 from tradingview_ta import TA_Handler, Interval, Exchange
 import tradingview_ta
 
-figma_token = "figd__6YEJviBV6Dcx6eUSNE7lVEElusZkju_1mKxeSXE"
+
 
 handler = TA_Handler(
     symbol="AAPL",
